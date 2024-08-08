@@ -1,3 +1,5 @@
+test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -161,5 +163,15 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Ignore json fril from `MonCompteFormation` (https://opendata.caissedesdepots.fr/explore/dataset/moncompteformation_catalogueformation)
+# Ignore json file from `MonCompteFormation` (https://opendata.caissedesdepots.fr/explore/dataset/moncompteformation_catalogueformation)
 TRAITEMENT_MCF/SRC/*.json
+TRAITEMENT_MCF/*.ipynb
+
+# Ignore .json file download history
+last_update_date.txt
+
+# Ignore sqlite data base files
+*.db
+
+# Ignore CSV files
+*.csv
