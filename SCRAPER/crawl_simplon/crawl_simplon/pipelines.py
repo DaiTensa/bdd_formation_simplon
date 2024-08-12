@@ -6,6 +6,12 @@
 # useful for handling different item types with a single interface
 # from itemadapter import ItemAdapter
 
+# Path setting
+path = '/home/dai/Documents/Python_Projects/bdd_formation_simplon'
+import sys; sys.path.append(path)
+from BDD.models import URL_DATA_BASE
+
+
 # Imports standard
 import re
 from datetime import datetime
@@ -18,9 +24,10 @@ from itemadapter import ItemAdapter
 from geopy.geocoders import Nominatim
 
 # Imports internes
-from simplonbd.models import db_connect
-#from BDD.models import db_connect
-from simplonbd import crud_dai 
+# from simplonbd.models import db_connect
+from BDD.models import db_connect
+from BDD import crud
+# from simplonbd import crud 
 import sqlalchemy.exc as alchemyError
 
 #################################################################################################
@@ -132,70 +139,70 @@ class CrwalSimplonPipelineRncpInfoSave(BasePipeline):
 
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         try:
             coderncp = item.get("CodeRNCP")
             libelleformacode = item.get("IntituleCertification")
-            date_echance = item.get("DateEchanceEnregistrement")
+   
 
             if not coderncp:
                 return item
             
        
-            exists = crud_dai.get_rncp_code(rncpcode=coderncp, session=session)
+            exists = crud.get_rncp_code(rncpcode=coderncp, session=self.session)
             
             if not exists:
-                crud_dai.insert_rncp_code(rncpcode=coderncp, libelle=libelleformacode, date_fin=date_echance, session=session)
+                crud.insert_rncp_code(rncpcode=coderncp, libelle=libelleformacode, session=self.session)
             
             return item
         
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
         
 
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
 class CrwalSimplonPipelineFormacodesInfoSave(BasePipeline):
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         try:
             formacodes = item.get("FormaCode")
             libelleformacodes = item.get("LibelleFormaCode")
             
 
             for formacode, libelle in zip(formacodes, libelleformacodes):
-                formacode_exists = crud_dai.get_formacode(formacode=formacode, session=session)
+                formacode_exists = crud.get_formacode(formacode=formacode, session=self.session)
                 if not formacode_exists:
-                    crud_dai.insert_formacode(formacode=formacode, libelle=libelle, session=session)
+                    crud.insert_formacode(formacode=formacode, libelle=libelle, session=self.session)
             
             return item
   
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
         
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
 class CrwalSimplonPipelineRsInfoSave(BasePipeline):
 
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session= db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         try:
             coders = item.get("CodeRS")
             libellers = item.get("IntituleCertification")
@@ -204,29 +211,29 @@ class CrwalSimplonPipelineRsInfoSave(BasePipeline):
             if not coders:
                 return item
             
-            exists = crud_dai.get_rs_code(rscode=coders, session=session)
+            exists = crud.get_rs_code(rscode=coders, session=self.session)
             
             if not exists:
-                crud_dai.insert_rs_code(rscode=coders, libelle=libellers, date_fin=date_echance, session=session)
+                crud.insert_rs_code(rscode=coders, libelle=libellers, date_fin=date_echance, session=self.session)
                    
             return item
         
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
         
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
 class CrwalSimplonPipelineNsfInfoSave(BasePipeline):
 
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         try:   
             
             nsfcodes = item.get("NfsCode")
@@ -237,29 +244,29 @@ class CrwalSimplonPipelineNsfInfoSave(BasePipeline):
     
 
             for nsfcode, libelle in zip(nsfcodes, libellensfcodes):
-                nsf_exists = crud_dai.get_nsf_code(nsfcode=nsfcode, session=session)
+                nsf_exists = crud.get_nsf_code(nsfcode=nsfcode, session=self.session)
                 if not nsf_exists:
-                    crud_dai.insert_nsf_code(nsfcode=nsfcode, libelle=libelle, session=session)
+                    crud.insert_nsf_code(nsfcode=nsfcode, libelle=libelle, session=self.session)
             
             return item
   
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
 
  
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close_all()
 
 class CrwalSimplonPipelineFormationSave(BasePipeline):
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
-        # crud_dai.insert_organisme_test() # En local à décommenter avant de run le scraper pour pouvoir insérer un organisme
+        self.session = db_connect()()
+        crud.insert_organisme_test(session=self.session)
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         
         try:
             idsimplon = item.get("IdFormation")
@@ -270,33 +277,32 @@ class CrwalSimplonPipelineFormationSave(BasePipeline):
                 return item
     
             
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
+            formation_exists = crud.get_formation(idsimplon=idsimplon, session=self.session)
             
             if not formation_exists:
-                crud_dai.insert_formation(idsimplon=idsimplon,
+                crud.insert_formation(idsimplon=idsimplon,
                                           libelle=libelleformation,
                                           resumeprogramme=resumeprogramme,
-                                          session=session
+                                          session=self.session
                                           )
             return item
         
   
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
     
-    
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
 class CrwalSimplonPipelineFormationFormacodeSave(BasePipeline):
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         
         try:
             idsimplon = item.get("IdFormation")
@@ -306,37 +312,37 @@ class CrwalSimplonPipelineFormationFormacodeSave(BasePipeline):
             if not idsimplon:
                 return item
     
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
+            formation_exists = crud.get_formation(idsimplon=idsimplon, session=self.session)
             
             if formation_exists:
                 # Récupérer le id de la formation
-                idformation = crud_dai.get_id_formation(idsession=idsimplon, session=session)
+                idformation = crud.get_id_formation(idsession=idsimplon, session=self.session)
 
                 # Récupérer le formacode de la formation
                 for formacode, libelle in zip(formacodes, libelleformacodes):
                     # Insérer le ligne dans la table formacode
-                    crud_dai.insert_formacode_table(formacode=formacode, idformation=idformation, session=session)
+                    crud.insert_formacode_table(formacode=formacode, idformation=idformation, session=self.session)
                 
                 return item
             
             return item
 
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
     
 
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close_all()
 
 class CrwalSimplonPipelineFormationNsfSave(BasePipeline):
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         
         try:
             idsimplon = item.get("IdFormation")
@@ -345,40 +351,37 @@ class CrwalSimplonPipelineFormationNsfSave(BasePipeline):
             
             if not idsimplon:
                 return item
-    
             
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
+            formation_exists = crud.get_formation(idsimplon=idsimplon, session=self.session)
             
-
             if formation_exists:
                 # Récupérer le id de la formation
-                idformation = crud_dai.get_id_formation(idsession=idsimplon, session=session)
+                idformation = crud.get_id_formation(idsession=idsimplon, session=self.session)
 
                 # Récupérer le nsf code  de la formation
                 for nsfcode, libelle in zip(nsfcodes, libellensfcodes):
                     # Insérer le ligne dans la table nsf
-                    crud_dai.insert_nsf_table(nsfcode=nsfcode, idformation=idformation, session=session)
+                    crud.insert_nsf_table(nsfcode=nsfcode, idformation=idformation, session=self.session)
                 
                 return item
             
             return item
 
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
-    
 
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
 class CrwalSimplonPipelineFormationRsfSave(BasePipeline):
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         
         try:
             idsimplon = item.get("IdFormation")
@@ -387,32 +390,32 @@ class CrwalSimplonPipelineFormationRsfSave(BasePipeline):
             if not idsimplon:
                 return item
     
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
+            formation_exists = crud.get_formation(idsimplon=idsimplon, session=self.session)
             
             if formation_exists:
                 # Récupérer le id de la formation
-                idformation = crud_dai.get_id_formation(idsession=idsimplon, session=session)
+                idformation = crud.get_id_formation(idsession=idsimplon, session=self.session)
                 if coders:
-                    crud_dai.insert_rs_table(rscode=coders, idformation=idformation, session=session)
+                    crud.insert_rs_table(rscode=coders, idformation=idformation, session=self.session)
     
             return item
 
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
     
 
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
 class CrwalSimplonPipelineFormationRncpfSave(BasePipeline):
     def __init__(self, spider_name):
         super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
         
         try:
             idsimplon = item.get("IdFormation")
@@ -421,185 +424,25 @@ class CrwalSimplonPipelineFormationRncpfSave(BasePipeline):
             if not idsimplon:
                 return item
     
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
+            formation_exists = crud.get_formation(idsimplon=idsimplon, session=self.session)
             
             if formation_exists:
                 # Récupérer le id de la formation
-                idformation = crud_dai.get_id_formation(idsession=idsimplon, session=session)
+                idformation = crud.get_id_formation(idsession=idsimplon, session=self.session)
                 if coderncp:
-                    crud_dai.insert_rncp_table(rncpcode=coderncp, idformation=idformation, session=session)
+                    crud.insert_rncp_table(rncpcode=coderncp, idformation=idformation, session=self.session)
     
             return item
 
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
     
 
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
-
-class CrwalSimplonPipelineFormationRncpNsfSave(BasePipeline):
-    def __init__(self, spider_name):
-        super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
-
-    def process_item(self, item, spider):
-        session = self.Sessionmaker()
-        
-        try:
-            idsimplon = item.get("IdFormation")
-            coderncp = item.get("CodeRNCP")
-            nsfcodes = item.get("NfsCode")
-            libellensfcodes = item.get("LibelleNfsCode")
-           
-            if not idsimplon:
-                return item
-    
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
-            
-            if formation_exists:
-
-                if coderncp:
-                    # Récupérer le nsf code  de la formation
-                    for nsfcode, libelle in zip(nsfcodes, libellensfcodes):
-                        # Insérer le ligne dans la table nsf
-                        crud_dai.insert_rncp_nsf_table(rncpcode=coderncp, nsfcode=nsfcode, session=session)
-                
-                return item
-            
-            return item
-
-        except Exception as e:
-            session.rollback()
-            spider.logger.error(f"Error: {e} - Failed to process item {item}")
-            return item
-    
-
-    def close_spider(self, spider):
-        self.Sessionmaker.close_all()
-
-class CrwalSimplonPipelineFormationRncpFormacodeSave(BasePipeline):
-    def __init__(self, spider_name):
-        super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
-
-    def process_item(self, item, spider):
-        session = self.Sessionmaker()
-        
-        try:
-            idsimplon = item.get("IdFormation")
-            coderncp = item.get("CodeRNCP")
-            formacodes = item.get("FormaCode")
-            libelleformacodes = item.get("LibelleFormaCode")
-           
-            if not idsimplon:
-                return item
-    
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
-            
-            if formation_exists:
-
-                if coderncp:
-                    # Récupérer le nsf code  de la formation
-                    for formacode, libelle in zip(formacodes, libelleformacodes):
-                        crud_dai.insert_rncp_formacode_table(rncpcode=coderncp, formacode=formacode, session=session)
-            
-                    return item
-                
-            
-            return item
-
-        except Exception as e:
-            session.rollback()
-            spider.logger.error(f"Error: {e} - Failed to process item {item}")
-            return item
-    
-
-    def close_spider(self, spider):
-        self.Sessionmaker.close_all()
-
-class CrwalSimplonPipelineFormationRsNsfSave(BasePipeline):
-    def __init__(self, spider_name):
-        super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
-
-    def process_item(self, item, spider):
-        session = self.Sessionmaker()
-        
-        try:
-            idsimplon = item.get("IdFormation")
-            coders = item.get("CodeRS")
-            nsfcodes = item.get("NfsCode")
-            libellensfcodes = item.get("LibelleNfsCode")
-           
-            if not idsimplon:
-                return item
-    
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
-            
-            if formation_exists:
-
-                if coders:
-                    # Récupérer le nsf code  de la formation
-                    for nsfcode, libelle in zip(nsfcodes, libellensfcodes):
-                        # Insérer le ligne dans la table nsf
-                        crud_dai.insert_rs_nsf_table(rscode=coders, nsfcode=nsfcode, session=session)
-                
-                return item
-            
-            return item
-
-        except Exception as e:
-            session.rollback()
-            spider.logger.error(f"Error: {e} - Failed to process item {item}")
-            return item
-    
-
-    def close_spider(self, spider):
-        self.Sessionmaker.close_all()
-                      
-class CrwalSimplonPipelineFormationRsFormacodeSave(BasePipeline):
-    def __init__(self, spider_name):
-        super().__init__(spider_name)
-        self.Sessionmaker = db_connect()
-
-    def process_item(self, item, spider):
-        session = self.Sessionmaker()
-        
-        try:
-            idsimplon = item.get("IdFormation")
-            coders = item.get("CodeRS")
-            formacodes = item.get("FormaCode")
-            libelleformacodes = item.get("LibelleFormaCode")
-           
-            if not idsimplon:
-                return item
-    
-            formation_exists = crud_dai.get_formation(idsimplon=idsimplon, session=session)
-            
-            if formation_exists:
-
-                if coders:
-                    # Récupérer le nsf code  de la formation
-                    for formacode, libelle in zip(formacodes, libelleformacodes):
-                        crud_dai.insert_rs_formacode_table(rscode=coders, formacode=formacode, session=session)
-            
-                    return item
-                
-            
-            return item
-
-        except Exception as e:
-            session.rollback()
-            spider.logger.error(f"Error: {e} - Failed to process item {item}")
-            return item
-    
-
-    def close_spider(self, spider):
-        self.Sessionmaker.close_all()
-            
+        self.session.close()
+                     
 ##################################################################################################
 #########################################  SESSION  ##############################################
 ##################################################################################################
@@ -649,8 +492,6 @@ class CrawlSimplonPipelineSession:
                 item['Alternance'] = 1
             else:
                 item['Alternance'] = 0
-
-        print("**************************************")
         return item
     
     def clean_date_debut(self, item):
@@ -697,10 +538,8 @@ class CrawlSimplonPipelineSession:
         if type_formation:
             if any('Distan' in tf for tf in type_formation):
                 item['Distance'] = 1
-
             else:
                 item['Distance']  = 0
-
         return item
 
     def clean_niveau_sortie(self, item):
@@ -714,7 +553,7 @@ class CrawlSimplonPipelineSession:
     def clean_ville(self, item):
         adapter = ItemAdapter(item)
         villes = adapter.get('Ville', [])
-        
+
         # Supprimer le préfixe "Simplon " de chaque ville et les éléments indésirables
         unwanted_terms = ["Simplon ", "100 % Distanciel", "100% Distanciel", "Distanciel", "Alternance", "Distance"]
         
@@ -740,7 +579,7 @@ class CrawlSimplonPipelineSession:
                 address = self.geolocator.reverse((location.latitude, location.longitude), language='fr').raw['address']
                 code_dept = address.get('postcode', '')[:2]
                 if code_dept.isdigit():
-                    item['Code_Dept'] = int(code_dept)
+                    item['Code_Dept'] = str(code_dept)
         
         return item
     
@@ -758,7 +597,7 @@ class CrawlSimplonPipelineSession:
 class CrwalSimplonPipelineSessionSave:
     def __init__(self, spider_name):
         self.spider_name = spider_name
-        self.Sessionmaker = db_connect()
+        self.session = db_connect()()
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -768,60 +607,53 @@ class CrwalSimplonPipelineSessionSave:
         return cls(spider_name)
 
     def process_item(self, item, spider):
-        session = self.Sessionmaker()
+        # session = self.Sessionmaker()
 
         try:
 
             idsession = item.get("IdSession")
             codesession = item.get("Code_Session")
-            nomdept = item.get("Nom_Dept")
-            datedebut = item.get("Date_Debut")
-            datelimitcand = item.get("Date_Limite_Candidature")
-            duree = item.get("Duree")
-            niveausortie = item.get("Niveau_Sortie")
-            libellecertif = item.get("Libele_Certification")
+            # nomdept = item.get("Nom_Dept")
+            # datedebut = item.get("Date_Debut")
+            # datelimitcand = item.get("Date_Limite_Candidature")
+            # duree = item.get("Duree")
+            # niveausortie = item.get("Niveau_Sortie")
+            # libellecertif = item.get("Libele_Certification")
             codepet = item.get("Code_Dept")
-            alternance = item.get("Alternance")
-            distance = item.get("Distance")
+            # alternance = item.get("Alternance")
+            # distance = item.get("Distance")
 
 
-            formation_exists = crud_dai.get_formation(idsimplon = idsession, session=session) 
+            formation_exists = crud.get_formation(idsimplon = idsession, session=self.session) 
     
             if not formation_exists:
                 return item
             
             if formation_exists:
-                idformation = crud_dai.get_id_formation(idsession=idsession, session=session)
+                idformation = crud.get_id_formation(idsession=idsession, session=self.session)
 
-                print("#################################################################")
-                print("#################################################################")
-                print("Formation id : ", idformation)
-                print("#################################################################")
-
-
-
-                crud_dai.insert_session(
+                crud.insert_session(
                     formationid=int(idformation),
                     codesession=codesession,
-                    niveausortie=niveausortie,
-                    nomdept=nomdept,
+                    # niveausortie=niveausortie,
+                    # nomdept=nomdept,
                     codedept=codepet,
-                    datedebut=datedebut,
-                    datelimitcand=datelimitcand,
-                    duree=duree,
-                    alternance=alternance,
-                    distance=distance,
-                    libellecertif=libellecertif,
-                    session=session
+                    # datedebut=datedebut,
+                    # datelimitcand=datelimitcand,
+                    # duree=duree,
+                    # alternance=alternance,
+                    # distance=distance,
+                    # libellecertif=libellecertif,
+                    session=self.session
                     )
         
             return item
   
         except Exception as e:
-            session.rollback()
+            self.session.rollback()
             spider.logger.error(f"Error: {e} - Failed to process item {item}")
             return item
         
     def close_spider(self, spider):
-        self.Sessionmaker.close_all()
+        self.session.close()
 
