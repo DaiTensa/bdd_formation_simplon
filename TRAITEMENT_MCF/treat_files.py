@@ -2,6 +2,7 @@ import inspect
 import regex as re
 import pandas as pd
 from BDD import models, crud
+from BDD.models import URL_DATA_BASE
 
 # BASIC SETTINGS & INITIALIZATION
 file = "TRAITEMENT_MCF/SRC/data_formation.json"  # Path to the most recent json
@@ -14,7 +15,8 @@ def get_session():
     Needs no arguments. Returns a session object (see SQLAlchemy for details).
     """
 
-    url = 'sqlite:///./SCRAPER/crawl_simplon/crawl_simplon/simplon.db'
+    # url = 'sqlite:///./SCRAPER/crawl_simplon/crawl_simplon/simplon.db'
+    url = URL_DATA_BASE
     session = models.db_connect(url=url)
     return session()
 
@@ -33,20 +35,20 @@ def load_data():
     save_organizations_to_database(data=data, session=session)
     save_trainings_to_database(data=data, session=session)
     save_new_sessions_to_database(data=data, session=session)
-    update_sessions_status_in_database(data=data, session=session)
+    # update_sessions_status_in_database(data=data, session=session)
     save_rncp_codes_to_database(data=data, session=session)
     save_rs_codes_to_database(data=data, session=session)
     save_nsf_codes_to_database(data=data, session=session)
     save_formacodes_to_database(data=data, session=session)
-    update_codes_info_in_database(data=data, session=session)
+    # update_codes_info_in_database(data=data, session=session)
     associate_trainings_and_rncp_codes(data=data, session=session)
     associate_trainings_and_formacodes(data=data, session=session)
     associate_trainings_and_rs_codes(data=data, session=session)
     associate_trainings_and_nsf_codes(data=data, session=session)
-    associate_rncp_codes_and_formacodes(data=data, session=session)
-    associate_rs_codes_and_formacodes(data=data, session=session)
-    associate_rncp_and_nsf_codes(data=data, session=session)
-    associate_rs_and_nsf_codes(data=data, session=session)
+    # associate_rncp_codes_and_formacodes(data=data, session=session)
+    # associate_rs_codes_and_formacodes(data=data, session=session)
+    # associate_rncp_and_nsf_codes(data=data, session=session)
+    # associate_rs_and_nsf_codes(data=data, session=session)
 
     # CLOSING THE SESSION
     session.close()
@@ -146,16 +148,20 @@ def save_new_sessions_to_database(data, session):
 
     # BASIC SETTINGS & INITIALIZATION (Management of column names)
     keys = ['Formation_Id', 'Code_Session']            # Composite primary key
-    cols = keys + ['nom_departement',                  # Dataframe column names
-                   'nom_region',
+    cols = keys + [
+                #    'nom_departement',                  # Dataframe column names
+                #    'nom_region',
                    'code_departement',
-                   'code_region',
-                   'libelle_niveau_sortie_formation']
-    fields = keys + ['Nom_Dept',                       # Database column names
-                     'Nom_Region',
+                #    'code_region',
+                #    'libelle_niveau_sortie_formation'
+                   ]
+    fields = keys + [
+                    # 'Nom_Dept',                       # Database column names
+                    #  'Nom_Region',
                      'Code_Dept',
-                     'Code_Region',
-                     'Niveau_Sortie']
+                    #  'Code_Region',
+                    #  'Niveau_Sortie'
+                     ]
 
     # DROP ALL DUPLICATE TRAININGS FROM THE SOURCE DATAFRAME (keeps one only!)
     sort_by = keys + cols[-1:]
@@ -183,10 +189,10 @@ def save_new_sessions_to_database(data, session):
         courses.drop(index=courses.index[indexes_to_drop], inplace=True)
         courses.rename(columns=labels).to_sql(con=session.get_bind(), **kwargs)
 
-def update_sessions_status_in_database(data, session):
-    """Not implemented yet but purpose is to update status essentially
-    and alternance and Distanciel columns as well. To be considered again"""
-    pass
+# def update_sessions_status_in_database(data, session):
+#     """Not implemented yet but purpose is to update status essentially
+#     and alternance and Distanciel columns as well. To be considered again"""
+#     pass
 
 def save_rncp_codes_to_database(data, session):
     """
@@ -372,11 +378,11 @@ def save_formacodes_to_database(data, session):
         # DATA SAVING
         codes.to_sql(name='formacodes_info', con=session.get_bind(), **kwargs)
 
-def update_codes_info_in_database(data, session):
-    """Not implemented yet but purpose is to update codes title ('Libelle') and
-    end date ('Date_Fin'). Target tables of the function:
-    `rncp_Info`, `rs_info`, `nsf_info` and `formacodes_info`"""
-    pass
+# def update_codes_info_in_database(data, session):
+#     """Not implemented yet but purpose is to update codes title ('Libelle') and
+#     end date ('Date_Fin'). Target tables of the function:
+#     `rncp_Info`, `rs_info`, `nsf_info` and `formacodes_info`"""
+#     pass
 
 def associate_trainings_and_rncp_codes(data, session):
     """
@@ -596,25 +602,25 @@ def associate_trainings_and_nsf_codes(data, session):
         associations.drop(index=associations.index[indexes_to_drop], inplace=True)
         associations.to_sql(con=session.get_bind(), **kwargs)
 
-def associate_rncp_codes_and_formacodes(data, session):
-    """Not implemented yet but, as indicated, purpose is to populate the
-    association table between RNCP codes and Formacodes."""
-    pass
+# def associate_rncp_codes_and_formacodes(data, session):
+#     """Not implemented yet but, as indicated, purpose is to populate the
+#     association table between RNCP codes and Formacodes."""
+#     pass
 
-def associate_rs_codes_and_formacodes(data, session):
-    """Not implemented yet but, as indicated, purpose is to populate the
-    association table between RS codes and Formacodes."""
-    pass
+# def associate_rs_codes_and_formacodes(data, session):
+#     """Not implemented yet but, as indicated, purpose is to populate the
+#     association table between RS codes and Formacodes."""
+#     pass
 
-def associate_rncp_and_nsf_codes(data, session):
-    """Not implemented yet but, as indicated, purpose is to populate the
-    association table between RNCP codes and NSF codes."""
-    pass
+# def associate_rncp_and_nsf_codes(data, session):
+#     """Not implemented yet but, as indicated, purpose is to populate the
+#     association table between RNCP codes and NSF codes."""
+#     pass
 
-def associate_rs_and_nsf_codes(data, session):
-    """Not implemented yet but, as indicated, purpose is to populate the
-    association table between RS codes and NSF codes."""
-    pass
+# def associate_rs_and_nsf_codes(data, session):
+#     """Not implemented yet but, as indicated, purpose is to populate the
+#     association table between RS codes and NSF codes."""
+#     pass
 
 # 3. Auxiliary features (i.e. various & helper functions)
 def get_dataframe(file: str = file):

@@ -21,10 +21,6 @@ class SimplonspiderSpiderFormation(scrapy.Spider):
             "crawl_simplon.pipelines.CrwalSimplonPipelineFormationNsfSave": 325,
             "crawl_simplon.pipelines.CrwalSimplonPipelineFormationRsfSave": 330,
             "crawl_simplon.pipelines.CrwalSimplonPipelineFormationRncpfSave": 331,
-            "crawl_simplon.pipelines.CrwalSimplonPipelineFormationRncpNsfSave": 332,
-            "crawl_simplon.pipelines.CrwalSimplonPipelineFormationRncpFormacodeSave": 333,
-            "crawl_simplon.pipelines.CrwalSimplonPipelineFormationRsNsfSave": 334,
-            "crawl_simplon.pipelines.CrwalSimplonPipelineFormationRsFormacodeSave": 335,
         },
         'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter',
     }
@@ -89,7 +85,7 @@ class SimplonspiderSpiderFormation(scrapy.Spider):
         
         item = response.meta["item"]
 
-        item["IntituleCertification"] = response.xpath('//h1[@class="title--page--generic"]/text()').get()
+        item["IntituleCertification"] = response.xpath('//h2[@class="title--page--generic"]/text()').get()
 
         code_fiche_etat = response.xpath('//div[@class="banner--fcpt-certification__body__tags"]//span[@class="tag--fcpt-certification__status font-bold"]/text()').getall()
         if code_fiche_etat:
