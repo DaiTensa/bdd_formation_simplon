@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models
 
+# this file contains the CRUD (Create, Read, Update, Delete) operations for the database
 
 def get_formation_by_id(db: Session, formation_id: int):
     """

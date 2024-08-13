@@ -1,10 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from utils.my_functions import get_connection_uri
+from utils import my_functions
 
 # Get the connection URI
-DATABASE_URL = get_connection_uri()
+DATABASE_URL = my_functions.get_connection_uri()
 
 # Create the database engine
 engine = create_engine(DATABASE_URL)
