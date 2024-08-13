@@ -1,4 +1,4 @@
-# data-api-template
+# Simplon data base with streamlit interface
 
 ## Purpose
 
@@ -13,6 +13,24 @@ We will:
 
 read the full documentation: [here](https://charles-42.github.io/ml-model-api-template/)
 
+# Development environment
+
 ## Dependencies:
 - poetry
 - geopy
+
+We used poetry for managing virtual environments
+
+# Technologies
+
+The technologies used in our project are:
+
+1. Python
+2. FastAPI
+3. Docker
+4. Azure ACI
+5. Streamlit
+6. Poetry
+7. Geopy
+
+# Installation
