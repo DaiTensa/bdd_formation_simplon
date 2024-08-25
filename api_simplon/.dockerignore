@@ -23,7 +23,7 @@ docker-compose*
 .idea
 .vscode
 
-.env
+# Ignorer les fichiers de sauvegarde
 __pycache__
 
 # Ignore all .tf files

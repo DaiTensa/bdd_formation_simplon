@@ -11,12 +11,9 @@ COPY . /app
 WORKDIR /app
 
 EXPOSE 8000
-EXPOSE 8501
 
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-
-# Start both the backend and Streamlit dashboard
-CMD ["bash", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload & cd .. & streamlit run dashboard.py --server.port 8501"]
-
-# docker run --rm -p 8000:8000 -p 8501:8501 -v $(pwd):/app apisimplon
+# docker build -t apisimplon .
+# docker run --rm --env-file .env  -p 8000:8000 -v $(pwd):/app apisimplon
+# docker run --rm --env-file .env  -p 8000:8000 apisimplon
